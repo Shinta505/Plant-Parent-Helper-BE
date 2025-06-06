@@ -1,0 +1,130 @@
+### === AUTH ===
+### Login User
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "123456"
+}
+
+### Get New Access Token
+GET http://localhost:5000/token
+# Tambahkan refreshToken di cookie jika diperlukan
+
+### Logout
+DELETE http://localhost:5000/logout
+# Tambahkan refreshToken di cookie jika diperlukan
+
+
+### === USERS ===
+### Get All Users
+GET http://localhost:5000/users
+Authorization: Bearer {token}
+
+### Get User by ID
+GET http://localhost:5000/users/1
+Authorization: Bearer {token}
+
+### Create New User
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+  "name": "Shinta",
+  "email": "user@example.com",
+  "gender": "female",
+  "password": "123456"
+}
+
+### Update User
+PUT http://localhost:5000/users/1
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Shinta Chairani",
+  "email": "user@example.com",
+  "gender": "female",
+  "password": "123456"
+}
+
+### Delete User
+DELETE http://localhost:5000/users/1
+Authorization: Bearer {token}
+
+
+### === PLANTS ===
+### Get All Plants
+GET http://localhost:5000/plants
+Authorization: Bearer {token}
+
+### Get Plant by ID
+GET http://localhost:5000/plants/1
+Authorization: Bearer {token}
+
+### Create Plant
+POST http://localhost:5000/plants
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Monstera",
+  "location": "Ruang Tamu",
+  "note": "Tumbuh daun baru",
+  "userId": 1
+}
+
+### Update Plant
+PUT http://localhost:5000/plants/1
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Monstera Deliciosa",
+  "location": "Ruang Tamu",
+  "note": "Sudah dipindahkan ke pot baru"
+}
+
+### Delete Plant
+DELETE http://localhost:5000/plants/1
+Authorization: Bearer {token}
+
+
+### === TASKS ===
+### Get All Tasks
+GET http://localhost:5000/tasks
+Authorization: Bearer {token}
+
+### Get Task by ID
+GET http://localhost:5000/tasks/1
+Authorization: Bearer {token}
+
+### Create Task
+POST http://localhost:5000/tasks
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "type": "watering",
+  "schedule_time": "2025-06-07T08:00:00",
+  "note": "Gunakan air matang",
+  "status": "pending",
+  "plantId": 1
+}
+
+### Update Task
+PUT http://localhost:5000/tasks/1
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "type": "fertilizing",
+  "schedule_time": "2025-06-10T09:00:00",
+  "note": "Pupuk organik",
+  "status": "done"
+}
+
+### Delete Task
+DELETE http://localhost:5000/tasks/1
+Authorization: Bearer {token}
