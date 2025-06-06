@@ -25,29 +25,11 @@ app.set("view engine", "ejs");
 
 // Middlewares
 app.use(cookieParser());
-const allowedOrigins = []; // Tambahkan origin production Anda di sini jika perlu
-// contoh: ['https://your-production-frontend.com']
-
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Izinkan permintaan tanpa origin (seperti dari Postman atau mobile apps)
-      if (!origin) return callback(null, true);
-
-      // Izinkan semua origin dari localhost
-      if (origin.startsWith("http://localhost")) {
-        return callback(null, true);
-      }
-
-      // Cek jika origin ada di dalam whitelist production
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        return callback(null, true);
-      }
-
-      return callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true,
-  })
+  cors({
+    origin: "*", // Mengizinkan semua origin
+    credentials: true,
+  })
 );
 app.use(express.json());
 
