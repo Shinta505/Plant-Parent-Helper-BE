@@ -25,12 +25,6 @@ app.set("view engine", "ejs");
 
 // Middlewares
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: "*", // Mengizinkan semua origin
-    credentials: true,
-  })
-);
 app.use(express.json());
 
 // Routes
