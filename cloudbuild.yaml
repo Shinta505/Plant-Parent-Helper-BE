@@ -1,71 +1,35 @@
 steps:
-  # STEP 1: Install semua dependensi Node.js dari package.json
-  # Langkah ini penting agar sequelize-cli dan library lainnya bisa digunakan.
-  - name: 'gcr.io/cloud-builders/npm'
-    args: ['install']
-    id: 'Install Dependencies'
+  # STEP 1: Mengambil file .env dari Google Cloud Storage
+  - name: "gcr.io/cloud-builders/gsutil"
+    args: ["cp", "gs://plant-tpm/.env", ".env"]
 
-  # STEP 2: Salin file konfigurasi .env dari Google Cloud Storage ke direktori kerja
-  # Pastikan Anda sudah membuat Substitutions Variable `_BUCKET_NAME` di Trigger Anda.
-  - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', '${_ENV}', '.env']
-    id: 'Copy .env file'
+  # STEP 2: Build Docker image dari root folder
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/backend", "."]
 
-  # STEP 3: Jalankan migrasi database menggunakan sequelize-cli
-  # Pastikan Service Account Cloud Build Anda memiliki role "Cloud SQL Client".
-  # Gunakan npx untuk menjalankan binary dari node_modules.
-  - name: 'gcr.io/cloud-builders/npm'
-    entrypoint: 'npx'
-    args: ['sequelize-cli', 'db:migrate']
-    id: 'Run Migrations'
+  # STEP 3: Push Docker image ke Google Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/backend"]
 
-  # STEP 4: Build Docker image
-  # Image akan di-tag dengan format Artifact Registry.
-  # Pastikan Anda sudah membuat Artifact Registry repository bernama `plant-parent-helper-repo` di region yang sama.
-  - name: 'gcr.io/cloud-builders/docker'
+  # STEP 4: Deploy ke Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
     args:
-      - 'build'
-      - '-t'
-      - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/plant-parent-helper-repo/plant-parent-helper-be:latest'
-      - '.'
-    id: 'Build Docker Image'
+      [
+        "run",
+        "deploy",
+        "plant-parent-helper-backend",
+        "--image",
+        "gcr.io/$PROJECT_ID/backend",
+        "--timeout",
+        "1000s",
+        "--port",
+        "8080",
+        "--region",
+        "us-central1",
+        "--platform",
+        "managed",
+        "--allow-unauthenticated",
+      ]
 
-  # STEP 5: Push Docker image ke Google Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'push'
-      - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/plant-parent-helper-repo/plant-parent-helper-be:latest'
-    id: 'Push Docker Image'
-
-  # STEP 6: Deploy ke Cloud Run
-  # Menggunakan image yang baru saja di-push.
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args:
-      - 'run'
-      - 'deploy'
-      - 'plant-parent-helper-be' # Nama service di Cloud Run
-      - '--image'
-      - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/plant-parent-helper-repo/plant-parent-helper-be:latest'
-      - '--region'
-      - 'asia-southeast1' # Saya ganti ke region Asia Tenggara, sesuaikan jika perlu
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - '--port'
-      - '5000' # Port yang diexpose aplikasi Anda
-      - '--timeout'
-      - '1000s'
-      # Tambahkan koneksi ke Cloud SQL. Ganti `_DB_CONNECTION_NAME` dengan instance connection name Anda.
-      - '--add-cloudsql-instances=${_DB_CONNECTION_NAME}'
-      # Anda bisa menambahkan environment variables lain di sini jika diperlukan,
-      # contoh: '--set-env-vars=KEY=VALUE'
-    id: 'Deploy to Cloud Run'
-
-# Daftar image yang akan di-push ke Artifact Registry
-images:
-  - 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/plant-parent-helper-repo/plant-parent-helper-be:latest'
-
-# Opsi logging
 options:
   logging: CLOUD_LOGGING_ONLY
