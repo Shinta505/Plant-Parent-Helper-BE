@@ -27,7 +27,7 @@ app.set("view engine", "ejs");
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://127.0.0.1:5500", // <- Ganti sesuai alamat frontend
+    origin: "http://localhost:57371", // <- Ganti sesuai alamat frontend
     credentials: true,
   })
 );
