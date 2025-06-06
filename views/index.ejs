@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Parent Helper - API Documentation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #343a40;
+            --primary-color: #28a745;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --code-bg: #e9ecef;
+            --code-text: #212529;
+            --tag-get: #007bff;
+            --tag-post: #28a745;
+            --tag-patch: #fd7e14;
+            --tag-delete: #dc3545;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+
+        .base-url {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            text-align: center;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .base-url code {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .api-section {
+            background: var(--card-bg);
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            /* Ensures the child elements don't overflow the rounded corners */
+        }
+
+        .api-header {
+            padding: 1rem 1.5rem;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .api-header:hover {
+            background-color: #e9ecef;
+        }
+
+        .api-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .api-header .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .api-section.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+
+        .api-content {
+            padding: 1.5rem;
+            display: grid;
+            gap: 1.5rem;
+            transition: all 0.3s ease-in-out;
+            max-height: 5000px;
+            /* Large enough to not clip content */
+        }
+
+        .api-section.collapsed .api-content {
+            padding-top: 0;
+            padding-bottom: 0;
+            max-height: 0;
+            overflow: hidden;
+        }
+
+        .api-endpoint {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 6px var(--shadow-color);
+        }
+
+        .endpoint-summary {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .endpoint-method {
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 5px;
+            color: #fff;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+            min-width: 70px;
+        }
+
+        .endpoint-method.GET {
+            background-color: var(--tag-get);
+        }
+
+        .endpoint-method.POST {
+            background-color: var(--tag-post);
+        }
+
+        .endpoint-method.PATCH {
+            background-color: var(--tag-patch);
+        }
+
+        .endpoint-method.DELETE {
+            background-color: var(--tag-delete);
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .endpoint-description {
+            flex-grow: 1;
+            text-align: right;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .endpoint-details {
+            display: none;
+            padding: 1rem;
+            background-color: #fff;
+        }
+
+        .endpoint-details h4 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.25rem;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.85rem;
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .auth-note {
+            font-style: italic;
+            color: #888;
+            margin-top: 0;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .endpoint-summary {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .endpoint-method {
+                margin-bottom: 0.5rem;
+            }
+
+            .endpoint-description {
+                text-align: left;
+                margin-top: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Plant Parent Helper API</h1>
+            <p>Dokumentasi Lengkap untuk Mengelola Tanaman dan Tugas Perawatan</p>
+        </header>
+
+        <div class="base-url">
+            <strong>Base URL:</strong> <code><a href="https://plant-parent-helper-be-103949415038.us-central1.run.app/">https://plant-parent-helper-be-103949415038.us-central1.run.app/</a></code>
+        </div>
+
+        <div class="api-section">
+            <div class="api-header">
+                <h2>Autentikasi</h2>
+                <div class="toggle-icon">▾</div>
+            </div>
+            <div class="api-content">
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method POST">POST</span>
+                        <span class="endpoint-path">/login</span>
+                        <span class="endpoint-description">Login untuk mendapatkan token</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <p>Endpoint ini digunakan untuk autentikasi pengguna. Jika berhasil, server akan mengembalikan
+                            `accessToken` yang harus disertakan dalam header `Authorization` untuk request selanjutnya
+                            dan `refreshToken` dalam bentuk httpOnly cookie.</p>
+                        <h4>Request Body</h4>
+                        <pre><code>{
+    "email": "user@example.com",
+    "password": "password123"
+}</code></pre>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}</code></pre>
+                        <h4>Contoh Response Error (400/404)</h4>
+                        <pre><code>// Email tidak ditemukan
+{
+    "msg": "Email tidak ditemukan"
+}
+
+// Password salah
+{
+    "msg": "Password Salah"
+}</code></pre>
+                    </div>
+                </div>
+
+                <p class="auth-note"><strong>Catatan Penting:</strong> Semua endpoint selain <strong>POST
+                        /users</strong> dan <strong>POST /login</strong> memerlukan Bearer Token pada header
+                    Authorization.</br>Contoh: `Authorization: Bearer [accessToken]`</p>
+
+            </div>
+        </div>
+
+        <div class="api-section">
+            <div class="api-header">
+                <h2>Users API</h2>
+                <div class="toggle-icon">▾</div>
+            </div>
+            <div class="api-content">
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method GET">GET</span>
+                        <span class="endpoint-path">/users</span>
+                        <span class="endpoint-description">Mendapatkan semua pengguna</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Deskripsi</h4>
+                        <p>Mengambil daftar semua pengguna yang terdaftar. Memerlukan autentikasi.</p>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@example.com"
+    },
+    {
+        "id": 2,
+        "name": "Jane Doe",
+        "email": "jane@example.com"
+    }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method POST">POST</span>
+                        <span class="endpoint-path">/users</span>
+                        <span class="endpoint-description">Registrasi pengguna baru</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Request Body</h4>
+                        <pre><code>{
+    "name": "New User",
+    "email": "new@example.com",
+    "password": "password123",
+    "confPassword": "password123"
+}</code></pre>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "msg": "Register Berhasil"
+}</code></pre>
+                        <h4>Contoh Response Error</h4>
+                        <pre><code>// Password tidak cocok
+{
+    "msg": "Password dan Confirm Password tidak cocok"
+}
+
+// Email sudah terdaftar
+{
+    "msg": "Email sudah digunakan"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method GET">GET</span>
+                        <span class="endpoint-path">/token</span>
+                        <span class="endpoint-description">Memperbarui access token</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <p>Endpoint ini menggunakan `refreshToken` yang disimpan di cookie untuk menghasilkan
+                            `accessToken` baru.</p>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "accessToken": "eyJh... (token baru)"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method DELETE">DELETE</span>
+                        <span class="endpoint-path">/logout</span>
+                        <span class="endpoint-description">Logout pengguna</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <p>Menghapus `refreshToken` dari database dan membersihkan cookie.</p>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "msg": "Logout Berhasil"
+}</code></pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="api-section">
+            <div class="api-header">
+                <h2>Plants API</h2>
+                <div class="toggle-icon">▾</div>
+            </div>
+            <div class="api-content">
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method GET">GET</span>
+                        <span class="endpoint-path">/plants</span>
+                        <span class="endpoint-description">Mendapatkan daftar tanaman</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Deskripsi</h4>
+                        <p>Mengambil daftar semua tanaman milik pengguna yang sedang login.</p>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>[
+    {
+        "id": 1,
+        "userId": 1,
+        "name": "Monstera Deliciosa",
+        "species": "Monstera",
+        "watering_schedule": "Setiap 7 hari",
+        "last_watered": "2023-10-27T00:00:00.000Z",
+        "notes": "Suka cahaya tidak langsung."
+    }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method GET">GET</span>
+                        <span class="endpoint-path">/plants/:id</span>
+                        <span class="endpoint-description">Mendapatkan detail tanaman</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Deskripsi</h4>
+                        <p>Mengambil detail tanaman spesifik berdasarkan ID.</p>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "id": 1,
+    "userId": 1,
+    "name": "Monstera Deliciosa",
+    "species": "Monstera",
+    "watering_schedule": "Setiap 7 hari",
+    "last_watered": "2023-10-27T00:00:00.000Z",
+    "notes": "Suka cahaya tidak langsung."
+}</code></pre>
+                        <h4>Contoh Response Error (404 Not Found)</h4>
+                        <pre><code>{
+    "msg": "Tanaman tidak ditemukan"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method POST">POST</span>
+                        <span class="endpoint-path">/plants</span>
+                        <span class="endpoint-description">Membuat tanaman baru</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Request Body</h4>
+                        <pre><code>{
+    "name": "Lidah Mertua",
+    "species": "Sansevieria",
+    "watering_schedule": "Setiap 14 hari",
+    "notes": "Tahan kering."
+}</code></pre>
+                        <h4>Contoh Response Sukses (201 Created)</h4>
+                        <pre><code>{
+    "msg": "Tanaman berhasil ditambahkan"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method PATCH">PATCH</span>
+                        <span class="endpoint-path">/plants/:id</span>
+                        <span class="endpoint-description">Memperbarui data tanaman</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Request Body</h4>
+                        <p>Kirim hanya field yang ingin diperbarui.</p>
+                        <pre><code>{
+    "notes": "Sudah dipindahkan ke pot yang lebih besar."
+}</code></pre>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "msg": "Tanaman berhasil diperbarui"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method DELETE">DELETE</span>
+                        <span class="endpoint-path">/plants/:id</span>
+                        <span class="endpoint-description">Menghapus tanaman</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "msg": "Tanaman berhasil dihapus"
+}</code></pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="api-section">
+            <div class="api-header">
+                <h2>Tasks API</h2>
+                <div class="toggle-icon">▾</div>
+            </div>
+            <div class="api-content">
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method GET">GET</span>
+                        <span class="endpoint-path">/tasks</span>
+                        <span class="endpoint-description">Mendapatkan semua tugas</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Deskripsi</h4>
+                        <p>Mengambil semua tugas yang terkait dengan tanaman milik pengguna yang sedang login.</p>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>[
+    {
+        "id": 1,
+        "plantId": 1,
+        "task_type": "siram",
+        "due_date": "2023-11-03T00:00:00.000Z",
+        "completed": false
+    }
+]</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method POST">POST</span>
+                        <span class="endpoint-path">/tasks</span>
+                        <span class="endpoint-description">Membuat tugas baru</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Request Body</h4>
+                        <pre><code>{
+    "plantId": 1,
+    "task_type": "beri pupuk",
+    "due_date": "2023-11-15",
+    "completed": false
+}</code></pre>
+                        <h4>Contoh Response Sukses (201 Created)</h4>
+                        <pre><code>{
+    "msg": "Tugas berhasil dibuat"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method PATCH">PATCH</span>
+                        <span class="endpoint-path">/tasks/:id</span>
+                        <span class="endpoint-description">Memperbarui tugas</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Request Body</h4>
+                        <p>Kirim hanya field yang ingin diperbarui. Biasanya untuk menandai tugas sebagai selesai.</p>
+                        <pre><code>{
+    "completed": true
+}</code></pre>
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "msg": "Tugas berhasil diperbarui"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="api-endpoint">
+                    <div class="endpoint-summary">
+                        <span class="endpoint-method DELETE">DELETE</span>
+                        <span class="endpoint-path">/tasks/:id</span>
+                        <span class="endpoint-description">Menghapus tugas</span>
+                    </div>
+                    <div class="endpoint-details">
+                        <h4>Contoh Response Sukses (200 OK)</h4>
+                        <pre><code>{
+    "msg": "Tugas berhasil dihapus"
+}</code></pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const apiSections = document.querySelectorAll('.api-section');
+            const apiEndpoints = document.querySelectorAll('.api-endpoint .endpoint-summary');
+
+            apiSections.forEach(section => {
+                const header = section.querySelector('.api-header');
+                header.addEventListener('click', () => {
+                    section.classList.toggle('collapsed');
+                });
+                // Collapse all sections by default except Authentication
+                if (!header.textContent.includes('Autentikasi')) {
+                    section.classList.add('collapsed');
+                }
+            });
+
+            apiEndpoints.forEach(endpoint => {
+                endpoint.addEventListener('click', () => {
+                    const details = endpoint.nextElementSibling;
+                    if (details.style.display === 'block') {
+                        details.style.display = 'none';
+                    } else {
+                        details.style.display = 'block';
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
