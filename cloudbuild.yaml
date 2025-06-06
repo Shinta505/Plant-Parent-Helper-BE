@@ -17,7 +17,7 @@ steps:
       [
         "run",
         "deploy",
-        "plant-parent-helper-backend",
+        "plant-parent-helper-be",
         "--image",
         "gcr.io/$PROJECT_ID/backend",
         "--timeout",
