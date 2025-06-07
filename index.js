@@ -24,6 +24,7 @@ const PORT = process.env.PORT || 5000;
 app.set("view engine", "ejs");
 
 // Middlewares
+app.use(cors()); 
 app.use(cookieParser());
 app.use(express.json());
 
