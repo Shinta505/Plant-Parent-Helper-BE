@@ -13,6 +13,7 @@ import db from "./config/Database.js";
 import "./models/UserModel.js";
 import "./models/PlantModel.js";
 import "./models/TaskModel.js";
+import "./models/Associations.js";
 
 // Load .env config
 dotenv.config();
@@ -35,9 +36,12 @@ app.use(PlantRoute);
 app.use(TaskRoute);
 
 // Sync Database (opsional: bisa dihapus di production)
-db.sync().then(() => {
-  console.log("Database synced");
-});
+try {
+  await db.sync(); // atau db.sync({ alter: true }) agar tabel otomatis update
+  console.log("Database connected and synchronized");
+} catch (err) {
+  console.error("DB Sync Error:", err);
+}
 
 // Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

@@ -5,7 +5,13 @@ import Plant from "../models/PlantModel.js";
 async function getTasks(req, res) {
     try {
         const response = await Task.findAll({
-            include: [{ model: Plant, attributes: ["id", "name", "location"] }],
+            include: [
+                {
+                    model: Plant,
+                    // ✅ PERBAIKAN: Tambahkan "userId" di sini
+                    attributes: ["id", "name", "location", "userId"],
+                },
+            ],
         });
         res.status(200).json(response);
     } catch (error) {

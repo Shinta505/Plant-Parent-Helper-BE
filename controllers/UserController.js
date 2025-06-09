@@ -140,28 +140,40 @@ async function login(req, res) {
       const userPlain = user.toJSON();
       const { password: _, refresh_token: __, ...safeUserData } = userPlain;
       const isPasswordValid = await bcrypt.compare(password, user.password);
+
       if (isPasswordValid) {
+        // DATA PENTING YANG PERLU DIAMBIL
+        const userId = user.id; // Ambil ID pengguna dari data yang ditemukan
+        const name = user.name;
+        const email = user.email;
+
         const accessToken = jwt.sign(
-          safeUserData,
+          { userId, name, email }, // Payload bisa disederhanakan
           process.env.ACCESS_TOKEN_SECRET,
-          { expiresIn: "30s" }
+          { expiresIn: "1h" } // Durasi bisa disesuaikan
         );
         const refreshToken = jwt.sign(
-          safeUserData,
+          { userId, name, email },
           process.env.REFRESH_TOKEN_SECRET,
           { expiresIn: "1d" }
         );
         await User.update(
           { refresh_token: refreshToken },
-          { where: { id: user.id } }
+          { where: { id: userId } }
         );
         res.cookie("refreshToken", refreshToken, {
-          httpOnly: false,
+          httpOnly: true, // Lebih aman diset true jika tidak diakses dari client-side JS
+          maxAge: 24 * 60 * 60 * 1000 // Cookie berlaku 1 hari
         });
+
+        // ==========================================================
+        // MODIFIKASI DI SINI: Tambahkan `userId` ke dalam response
+        // ==========================================================
         return res.status(200).json({
           status: "Success",
           message: "Login Successful",
           accessToken,
+          userId: userId, // <-- INI BAGIAN TERPENTING YANG DITAMBAHKAN  // (Opsional) bisa ditambahkan jika perlu
         });
       }
     }

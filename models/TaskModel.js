@@ -1,3 +1,4 @@
+// Tambahan ke TaskModel.js untuk dukung tugas berulang
 import { DataTypes } from "sequelize";
 import db from "../config/Database.js";
 import Plant from "./PlantModel.js";
@@ -9,24 +10,27 @@ const Task = db.define("task", {
     primaryKey: true,
   },
   type: {
-    type: DataTypes.ENUM("watering", "fertilizing", "other"), // Jenis tugas
+    type: DataTypes.ENUM("watering", "fertilizing", "other"),
     allowNull: false,
   },
   schedule_time: {
-    type: DataTypes.DATE, // Jadwal tugas, misalnya 2025-06-07 08:00:00
+    type: DataTypes.DATE,
     allowNull: false,
   },
   note: {
-    type: DataTypes.TEXT, // Catatan tugas, contoh: "Gunakan pupuk organik"
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   status: {
-    type: DataTypes.ENUM("pending", "done"), // Status tugas
+    type: DataTypes.ENUM("pending", "done"),
     defaultValue: "pending",
+  },
+  repeatInterval: {
+    type: DataTypes.ENUM("none", "daily", "weekly", "monthly"),
+    defaultValue: "none",
   },
 });
 
-// Relasi: Satu tanaman bisa punya banyak task
 Plant.hasMany(Task, { foreignKey: "plantId" });
 Task.belongsTo(Plant, { foreignKey: "plantId" });
 

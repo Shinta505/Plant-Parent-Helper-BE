@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import db from "../config/Database.js";
-import User from "./UserModel.js";
 
 const Plant = db.define("plant", {
   id: {
@@ -9,21 +8,21 @@ const Plant = db.define("plant", {
     primaryKey: true,
   },
   name: {
-    type: DataTypes.STRING, // Nama tanaman, contoh: "Monstera"
+    type: DataTypes.STRING,
     allowNull: false,
   },
   location: {
-    type: DataTypes.STRING, // Lokasi tanaman, contoh: "Ruang tamu"
+    type: DataTypes.STRING,
     allowNull: true,
   },
   note: {
-    type: DataTypes.TEXT, // Catatan perkembangan, misalnya "Sudah tumbuh daun baru"
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  imageUrl: {
+    type: DataTypes.STRING,
     allowNull: true,
   },
 });
-
-// Relasi: Satu user bisa punya banyak tanaman
-User.hasMany(Plant, { foreignKey: "userId" });
-Plant.belongsTo(User, { foreignKey: "userId" });
 
 export default Plant;
